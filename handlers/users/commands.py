@@ -74,14 +74,17 @@ async def reaction_to_member(call: CallbackQuery, state: FSMContext):
 
 
 # Tashkilotni ushlash
-@dp.message_handler(state=AppealState.organization)
+@dp.message_handler(state=AppealState.organization,content_types='text')
 async def reaction_to_organization(message: types.Message, state: FSMContext):
     organization = message.text
-    await state.update_data({
-        'organization': organization
-    })
-    await message.answer("Bajarilgan ishni tanlang ⬇️", reply_markup=generate_task_buttons())
-    await AppealState.task_id.set()
+    if organization=='Back':
+        pass
+    else:
+        await state.update_data({
+            'organization': organization
+        })
+        await message.answer("Bajarilgan ishni tanlang ⬇️", reply_markup=generate_task_buttons())
+        await AppealState.task_id.set()
 
 @dp.callback_query_handler(state=AppealState.task_id)
 async def reaction_to_task(call: CallbackQuery, state: FSMContext):
@@ -103,15 +106,15 @@ async def reaction_to_location(message: types.Message, state: FSMContext):
                          "Jarayondan fotolavha yuklang ⏏️", reply_markup=types.ReplyKeyboardRemove())
     await AppealState.image.set()
 
-
+# Photo URL
 @dp.message_handler(content_types=types.ContentType.PHOTO, state=AppealState.image)
 async def handle_photo(message: types.Message, state: FSMContext):
     # Foydalanuvchidan kelgan rasmni saqlash
     photo_id = message.photo[-1].file_id
-    photo = await bot.download_file_by_id(photo_id)
     photo_file = await bot.get_file(photo_id)
+    photo_url = bot.get_file_url(file_path=photo_file.file_path)
     file_name = photo_file.file_path.split('/')[-1]
-    await state.update_data(image=photo)
+    await state.update_data(image=photo_url)
     await message.answer("✅Rasm qabul qilindi. Ma'lumotlaringiz rahbariyatga yuborildi! "
                          "Yangi vazifalarni qo'shishni unutmang")
 
@@ -128,8 +131,7 @@ async def handle_photo(message: types.Message, state: FSMContext):
         organization=organization,
         task=task_id,
         location=json.dumps(location),
-        photo=photo,
-        file_name=file_name)
+        photo=photo_url)
 
 
 @dp.message_handler(Text(equals="📊Mening ishlarim"))

@@ -6,7 +6,7 @@ env = Env()
 env.read_env()
 
 BASE_URL = env.str("URL")
-
+print(BASE_URL)
 def get_regions():
     url = f"{BASE_URL}/api/regions/"
     res = requests.get(url=url)
@@ -66,16 +66,20 @@ def get_tasks():
     return data
 
 
-def create_task(member, organization, task, location, photo, file_name):
-    url = f"{BASE_URL}/api/todo/"
-    data = {
-        "member": member,
-        "organization": organization,
-        'location': location,
-        'task': task
-    }
-    response = requests.post(url=url, data=data, files={'photo': (file_name, photo)})
-    return response.json()
+def create_task(member, organization, task, location, photo):
+    try:
+        url = f"{BASE_URL}/api/todo/"
+        data = {
+            "member": member,
+            "organization": organization,
+            'location': location,
+            'task': task,
+            'photo': photo
+        }
+        response = requests.post(url=url, data=data)
+        return response.json()
+    except Exception as e:
+        print(e)
 
 
 def todo_by_telegramID(telegram_id):
@@ -83,7 +87,3 @@ def todo_by_telegramID(telegram_id):
     res = requests.get(url=url)
     data = res.json()
     return data
-
-
-
-
