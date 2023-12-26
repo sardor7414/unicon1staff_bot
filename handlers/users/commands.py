@@ -1,6 +1,5 @@
 import asyncio
 import json
-
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ChatActions
 from loader import dp, bot
@@ -100,7 +99,8 @@ async def reaction_to_task(call: CallbackQuery, state: FSMContext):
 async def reaction_to_location(message: types.Message, state: FSMContext):
     location = message.location
     await state.update_data({
-        "location": location
+        "latitude": location.latitude,
+        'longitude':location.longitude
     })
     await message.answer("✅Joylashuv qabul qilindi! "
                          "Jarayondan fotolavha yuklang ⏏️", reply_markup=types.ReplyKeyboardRemove())
@@ -122,7 +122,6 @@ async def handle_photo(message: types.Message, state: FSMContext):
     member_id = data['member_id']
     organization = data['organization']
     task_id = data['task_id']
-    location = dict(data['location'])
     # photo = data['image']
 
     await state.finish()
@@ -130,7 +129,8 @@ async def handle_photo(message: types.Message, state: FSMContext):
         member=member_id,
         organization=organization,
         task=task_id,
-        location=json.dumps(location),
+        latitude=data['latitude'],
+        longitude=data['longitude'],
         photo=photo_url)
 
 

@@ -4,9 +4,7 @@ from environs import Env
 
 env = Env()
 env.read_env()
-
 BASE_URL = env.str("URL")
-print(BASE_URL)
 def get_regions():
     url = f"{BASE_URL}/api/regions/"
     res = requests.get(url=url)
@@ -66,13 +64,14 @@ def get_tasks():
     return data
 
 
-def create_task(member, organization, task, location, photo):
+def create_task(member, organization, task, latitude,longitude, photo):
     try:
-        url = f"{BASE_URL}/api/todo/"
+        url = f"{BASE_URL}/api/sardortodo/"
         data = {
             "member": member,
             "organization": organization,
-            'location': location,
+            'latitude': latitude,
+            'longitude':longitude,
             'task': task,
             'photo': photo
         }
